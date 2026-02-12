@@ -2,9 +2,20 @@
 
 # About this Project
 
-Movie recommendation systems are designed to provide personalized movie suggestions to users, enhancing their entertainment experience by helping them discover movies tailored to their preferences. This project showcases the development of a Movie Recommendation System using various machine-learning models and techniques. 
+Movie recommendation systems are designed to provide personalized movie suggestions to users, enhancing their entertainment experience by helping them discover movies tailored to their preferences. This project showcases the development of an End-to-End Movie Recommendation System with advanced analytics capabilities using various machine-learning models and techniques. 
 
-The primary goal of this project is to build a robust movie recommendation system that can analyze user preferences and viewing history to make accurate movie suggestions. It utilizes popular machine-learning algorithms to classify movies and generate personalized recommendations.
+The primary goal of this project is to build a robust movie recommendation system that can analyze user preferences and viewing history to make accurate movie suggestions. It utilizes popular machine-learning algorithms to classify movies, generate personalized recommendations, and provide comprehensive analytics on user behavior, content popularity, sentiment trends, and engagement patterns.
+
+## Key Features
+
+- **Movie Recommendations**: Content-based filtering using cosine similarity
+- **Sentiment Analysis**: NLP-based review classification from IMDB
+- **Analytics Dashboard**: Real-time user behavior and content performance tracking
+- **Popularity Prediction**: ML-based content popularity forecasting
+- **Fake Engagement Detection**: Anomaly detection for suspicious activity
+- **Sentiment Trend Analysis**: Time-series sentiment tracking
+- **User Behavior Tracking**: Session analytics and consumption patterns
+- **EDA Capabilities**: Comprehensive exploratory data analysis
 
 ## Built-With
 
@@ -67,12 +78,20 @@ Follow these steps to install and set up the project directly from the GitHub re
 
 5. **Run the Project**
    - Start the project by running the appropriate command.
+   
+   **Option A: Basic Version (Recommendations Only)**
      ```
      python app.py
      ```
+   
+   **Option B: Enhanced Version (With Analytics Dashboard)**
+     ```
+     python app_enhanced.py
+     ```
 
 6. **Access the Project**
-   - Open a web browser or the appropriate client to access the project.
+   - **Main Application**: Open http://localhost:5000 in your web browser
+   - **Analytics Dashboard**: Open http://localhost:5000/analytics (enhanced version only)
   
 <br><br>
 ### Option 2: Installation from DockerHub
@@ -93,11 +112,97 @@ If you prefer to use Docker, you can install and run the project using a Docker 
      ```
 
 3. **Access the Project**
-   - Open a web browser or the appropriate client to access the project.
+   - **Main Application**: Open http://localhost:5000 in your web browser
+   - **Analytics Dashboard**: Open http://localhost:5000/analytics
 
 
 
    
+# Features & Capabilities
+
+## Core Features
+- **Movie Search**: Auto-complete search functionality for easy movie discovery
+- **Smart Recommendations**: Get 10 similar movies based on content-based filtering
+- **Sentiment Analysis**: Real-time IMDB review scraping and sentiment classification
+- **Movie Details**: View cast, ratings, runtime, genres, and overview
+- **User Reviews**: See aggregated reviews with sentiment indicators (Good/Bad)
+
+## Analytics Features (Enhanced Version)
+- **User Behavior Analytics**: Track user interactions, sessions, and preferences
+- **Content Performance**: Monitor movie popularity and engagement metrics
+- **Sentiment Trends**: Analyze sentiment patterns over time
+- **Fake Engagement Detection**: Identify suspicious activity and bot behavior
+- **Popularity Prediction**: ML-based forecasting of content popularity
+- **Real-time Dashboard**: Interactive analytics dashboard with auto-refresh
+- **EDA Tools**: Comprehensive exploratory data analysis capabilities
+
+## API Endpoints
+
+### Main Application
+- `GET /` or `/home` - Home page with movie search
+- `POST /similarity` - Get similar movies
+- `POST /recommend` - Get movie recommendations with details
+
+### Analytics API (Enhanced Version)
+- `GET /analytics` - Analytics dashboard
+- `GET /api/analytics/dashboard` - Dashboard metrics (JSON)
+- `GET /api/analytics/user-behavior` - User behavior data (JSON)
+- `GET /api/analytics/trending` - Trending movies (JSON)
+- `GET /api/analytics/eda` - EDA statistics (JSON)
+- `GET /api/analytics/sentiment` - Sentiment analysis results (JSON)
+- `GET /api/analytics/ml-predictions` - ML predictions (JSON)
+- `GET /api/analytics/movie/<movie_id>` - Movie-specific analytics (JSON)
+- `POST /api/analytics/fake-detection` - Fake engagement detection (JSON)
+
+# Project Structure
+
+```
+End-to-End-Movie-Recommendation-System/
+├── app.py                          # Original Flask application
+├── app_enhanced.py                 # Enhanced app with analytics
+├── analytics_engine.py             # Analytics & ML modules
+├── sentiment_analyzer.py           # Sentiment analysis module
+├── ml_predictor.py                 # ML prediction module
+├── eda_stats.py                    # EDA statistics generator
+├── requirements.txt                # Python dependencies
+├── Dockerfile                      # Docker configuration
+├── Artifacts/                      # Models & datasets
+│   ├── nlp_model.pkl              # Sentiment analysis model
+│   ├── tranform.pkl               # Text vectorizer
+│   ├── main_data.csv              # Movie dataset
+│   └── movies.csv                 # Extended movie data
+├── templates/                      # HTML templates
+│   ├── home.html                  # Landing page
+│   ├── recommend.html             # Recommendation results
+│   └── analytics.html             # Analytics dashboard
+├── static/                         # CSS, JS, images
+│   ├── style.css
+│   ├── recommend.js
+│   └── autocomplete.js
+├── NoteBook_Experiments/           # Jupyter notebooks
+│   ├── Exploratory Data Analysis.ipynb
+│   ├── Movie Recommendation System.ipynb
+│   └── Sentimental Analysis on Reviews.ipynb
+├── ENHANCED_FEATURES.md            # Detailed feature documentation
+├── QUICK_START.md                  # Quick start guide
+├── EDA_README.md                   # EDA documentation
+└── README.md                       # This file
+```
+
+
+
+Contributions make the open-source community such an amazing place to learn, inspire, and create. I would greatly appreciate any contributions you make.
+
+If you have a suggestion that would make this better, please fork the repo and create a pull request. You can also simply open an issue with the tag "enhancement".
+Don't forget to give the project a star! Thanks again!
+
+1. Fork the Project
+2. Create your Feature Branch 
+3. Commit your Changes 
+4. Push to the Branch 
+5. Open a Pull Request
+
+<!-- LICENSE -->
 # Contributing
 
 Contributions make the open-source community such an amazing place to learn, inspire, and create. I would greatly appreciate any contributions you make.
@@ -118,5 +223,5 @@ Distributed under the GNU General Public License v3.0. See `LICENSE.txt` for mor
 
 # Acknowledgements
 
-This project was inspired by the Kaggle dataset on Spam Email Detection and the corresponding competition. We also acknowledge the open-source Python libraries used in this project and their contributors.
+This project demonstrates end-to-end machine learning implementation for movie recommendations with advanced analytics capabilities. We acknowledge the open-source Python libraries used in this project, the TMDB API for movie data, IMDB for review data, and their contributors. Special thanks to the machine learning and data science community for their valuable resources and tools.
 
