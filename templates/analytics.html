@@ -1,0 +1,1019 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics Dashboard - Movie Recommendation System</title>
+    <link href="https://fonts.googleapis.com/css?family=IBM+Plex+Sans&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans JP', sans-serif;
+            background-image: url("../static/image.jpg");
+            background-color: #181818;
+            min-height: 100vh;
+            padding: 20px;
+            color: #fff;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: rgba(24, 24, 24, 0.9);
+            padding: 30px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            border: 2px solid rgba(250, 250, 51, 0.3);
+        }
+
+        .header h1 {
+            color: #FAFA33;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: bold;
+            text-shadow: #000000 0px 0px 13px;
+        }
+
+        .header p {
+            color: #e4e0e0;
+            font-size: 1.1em;
+        }
+
+        .nav-buttons {
+            margin-top: 20px;
+        }
+
+        .nav-buttons a {
+            display: inline-block;
+            padding: 12px 30px;
+            background: #e50914;
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            margin-right: 10px;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+
+        .nav-buttons a:hover {
+            background: #f40612;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(229, 9, 20, 0.4);
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .metric-card {
+            background: rgba(24, 24, 24, 0.9);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
+            transition: transform 0.3s;
+            border: 2px solid rgba(250, 250, 51, 0.2);
+        }
+
+        .metric-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(250, 250, 51, 0.3);
+            border-color: rgba(250, 250, 51, 0.5);
+        }
+
+        .metric-card h3 {
+            color: #FAFA33;
+            font-size: 1.1em;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .metric-value {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #fff;
+            margin-bottom: 10px;
+        }
+
+        .metric-label {
+            color: #e4e0e0;
+            font-size: 0.9em;
+        }
+
+        .chart-container {
+            background: rgba(24, 24, 24, 0.9);
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
+            border: 2px solid rgba(250, 250, 51, 0.2);
+        }
+
+        .chart-container h2 {
+            color: #FAFA33;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            text-shadow: #000000 0px 0px 10px;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid rgba(250, 250, 51, 0.2);
+        }
+
+        th {
+            background: rgba(229, 9, 20, 0.8);
+            color: white;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.9em;
+            letter-spacing: 1px;
+        }
+
+        tr:hover {
+            background: rgba(250, 250, 51, 0.1);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+
+        .badge-success {
+            background: #4caf50;
+            color: white;
+        }
+
+        .badge-warning {
+            background: #ff9800;
+            color: white;
+        }
+
+        .badge-danger {
+            background: #e50914;
+            color: white;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #FAFA33;
+            font-size: 1.2em;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(250, 250, 51, 0.2);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #FAFA33, #e50914);
+            border-radius: 10px;
+            transition: width 0.3s;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .feature-card {
+            background: rgba(24, 24, 24, 0.9);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
+            border: 2px solid rgba(250, 250, 51, 0.2);
+        }
+
+        .feature-card h3 {
+            color: #FAFA33;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .feature-card ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .feature-card li {
+            padding: 8px 0;
+            color: #e4e0e0;
+            border-bottom: 1px solid rgba(250, 250, 51, 0.1);
+        }
+
+        .feature-card li:last-child {
+            border-bottom: none;
+        }
+
+        .feature-card li:before {
+            content: "✓ ";
+            color: #4caf50;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎬 Entertainment Analytics Dashboard</h1>
+            <p>Comprehensive insights into content performance, user behavior, and engagement metrics</p>
+            <div class="nav-buttons">
+                <a href="/">🏠 Home</a>
+                <a href="#" onclick="refreshData()">🔄 Refresh Data</a>
+            </div>
+        </div>
+
+        <div class="metrics-grid" id="metricsGrid">
+            <div class="metric-card">
+                <h3>Total Sessions</h3>
+                <div class="metric-value" id="totalSessions">-</div>
+                <div class="metric-label">User interactions tracked</div>
+            </div>
+            <div class="metric-card">
+                <h3>Unique Users</h3>
+                <div class="metric-value" id="uniqueUsers">-</div>
+                <div class="metric-label">Active viewers</div>
+            </div>
+            <div class="metric-card">
+                <h3>Engagement Rate</h3>
+                <div class="metric-value" id="engagementRate">-</div>
+                <div class="metric-label">Overall platform engagement</div>
+            </div>
+            <div class="metric-card">
+                <h3>Avg Sentiment</h3>
+                <div class="metric-value" id="avgSentiment">-</div>
+                <div class="metric-label">Positive review ratio</div>
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <h2>📊 User Behavior Patterns</h2>
+            <div id="behaviorData" class="loading">Loading behavior analytics...</div>
+        </div>
+
+        <div class="chart-container">
+            <h2>🔥 Most Viewed Movies</h2>
+            <div class="table-container">
+                <table id="topMoviesTable">
+                    <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>Movie Title</th>
+                            <th>Views</th>
+                            <th>Trend</th>
+                        </tr>
+                    </thead>
+                    <tbody id="topMoviesBody">
+                        <tr>
+                            <td colspan="4" class="loading">Loading data...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- EDA Section -->
+        <div class="chart-container">
+            <h2>📊 Exploratory Data Analysis (EDA)</h2>
+            <p style="color: #e4e0e0; margin-bottom: 20px;">Comprehensive analysis of user behavior and content consumption patterns</p>
+            
+            <!-- EDA Statistics -->
+            <div class="metrics-grid" id="edaStats" style="margin-bottom: 30px;">
+                <div class="metric-card">
+                    <h3>Total Movies</h3>
+                    <div class="metric-value" id="totalMovies">-</div>
+                    <div class="metric-label">In database</div>
+                </div>
+                <div class="metric-card">
+                    <h3>Avg Rating</h3>
+                    <div class="metric-value" id="avgRating">-</div>
+                    <div class="metric-label">User ratings</div>
+                </div>
+                <div class="metric-card">
+                    <h3>Top Genre</h3>
+                    <div class="metric-value" id="topGenre" style="font-size: 1.8em;">-</div>
+                    <div class="metric-label" id="topGenreCount">-</div>
+                </div>
+                <div class="metric-card">
+                    <h3>Avg Runtime</h3>
+                    <div class="metric-value" id="avgRuntime">-</div>
+                    <div class="metric-label">Minutes</div>
+                </div>
+            </div>
+
+            <!-- Visualizations Grid -->
+            <div class="feature-grid">
+                <!-- Rating Distribution -->
+                <div class="feature-card">
+                    <h3>📊 Rating Distribution</h3>
+                    <div id="ratingDistChart" style="padding: 20px;">
+                        <canvas id="ratingChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Genre Analysis -->
+                <div class="feature-card">
+                    <h3>🎬 Top Genres</h3>
+                    <div id="genreChartContainer" style="padding: 20px;">
+                        <canvas id="genreChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Release Trends -->
+                <div class="feature-card" style="grid-column: span 2;">
+                    <h3>📅 Release Trends Over Time</h3>
+                    <div id="releaseTrendsContainer" style="padding: 20px;">
+                        <canvas id="releaseTrendsChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Budget vs Revenue -->
+                <div class="feature-card">
+                    <h3>💰 Budget vs Revenue</h3>
+                    <div id="budgetRevenueContainer" style="padding: 20px;">
+                        <p style="color: #e4e0e0; text-align: center;">Budget vs Revenue analysis requires financial data processing</p>
+                    </div>
+                </div>
+
+                <!-- Popularity Analysis -->
+                <div class="feature-card">
+                    <h3>🔥 Popularity Distribution</h3>
+                    <div id="popularityContainer" style="padding: 20px;">
+                        <div id="popularMoviesList"></div>
+                    </div>
+                </div>
+
+                <!-- Runtime Analysis -->
+                <div class="feature-card">
+                    <h3>⏱️ Runtime Distribution</h3>
+                    <div id="runtimeContainer" style="padding: 20px;">
+                        <p style="color: #e4e0e0; text-align: center;">Runtime: <span id="avgRuntimeDisplay">-</span> minutes average</p>
+                    </div>
+                </div>
+
+                <!-- Correlation Heatmap -->
+                <div class="feature-card">
+                    <h3>🔗 Feature Correlations</h3>
+                    <div id="correlationContainer" style="padding: 20px;">
+                        <canvas id="yearlyReleasesChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sentiment Analysis Section -->
+        <div class="chart-container">
+            <h2>🎭 Sentiment Analysis</h2>
+            <p style="color: #e4e0e0; margin-bottom: 20px;">AI-powered sentiment analysis of movie descriptions and reviews</p>
+            
+            <!-- Sentiment Statistics -->
+            <div class="metrics-grid" id="sentimentStats" style="margin-bottom: 30px;">
+                <div class="metric-card">
+                    <h3>😊 Positive</h3>
+                    <div class="metric-value" id="positiveCount">-</div>
+                    <div class="metric-label" id="positivePercent">-</div>
+                </div>
+                <div class="metric-card">
+                    <h3>😐 Neutral</h3>
+                    <div class="metric-value" id="neutralCount">-</div>
+                    <div class="metric-label" id="neutralPercent">-</div>
+                </div>
+                <div class="metric-card">
+                    <h3>😞 Negative</h3>
+                    <div class="metric-value" id="negativeCount">-</div>
+                    <div class="metric-label" id="negativePercent">-</div>
+                </div>
+                <div class="metric-card">
+                    <h3>📊 Avg Score</h3>
+                    <div class="metric-value" id="avgSentimentScore">-</div>
+                    <div class="metric-label">Overall sentiment</div>
+                </div>
+            </div>
+
+            <!-- Sentiment Visualizations -->
+            <div class="feature-grid">
+                <!-- Sentiment Distribution -->
+                <div class="feature-card">
+                    <h3>📊 Sentiment Distribution</h3>
+                    <div style="padding: 20px;">
+                        <canvas id="sentimentDistChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Genre-wise Sentiment -->
+                <div class="feature-card">
+                    <h3>🎬 Genre-wise Sentiment</h3>
+                    <div style="padding: 20px;">
+                        <canvas id="genreSentimentChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Most Positive Movies -->
+                <div class="feature-card">
+                    <h3>😊 Most Positive Movies</h3>
+                    <div id="positiveMoviesList" style="padding: 20px; max-height: 400px; overflow-y: auto;">
+                        <div class="loading">Loading...</div>
+                    </div>
+                </div>
+
+                <!-- Most Negative Movies -->
+                <div class="feature-card">
+                    <h3>😞 Most Negative Movies</h3>
+                    <div id="negativeMoviesList" style="padding: 20px; max-height: 400px; overflow-y: auto;">
+                        <div class="loading">Loading...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ML Popularity Predictions Section -->
+        <div class="chart-container">
+            <h2>🤖 ML Popularity Predictions</h2>
+            <p style="color: #e4e0e0; margin-bottom: 20px;">Machine Learning models predicting movie popularity</p>
+            
+            <!-- ML Model Metrics -->
+            <div class="metrics-grid" id="mlMetrics" style="margin-bottom: 30px;">
+                <div class="metric-card">
+                    <h3>📊 R² Score</h3>
+                    <div class="metric-value" id="r2Score">-</div>
+                    <div class="metric-label">Regression accuracy</div>
+                </div>
+                <div class="metric-card">
+                    <h3>🎯 Classification</h3>
+                    <div class="metric-value" id="classAccuracy">-</div>
+                    <div class="metric-label">Category accuracy</div>
+                </div>
+                <div class="metric-card">
+                    <h3>📈 Avg Predicted</h3>
+                    <div class="metric-value" id="avgPredicted">-</div>
+                    <div class="metric-label">Popularity score</div>
+                </div>
+                <div class="metric-card">
+                    <h3>🔢 Total Predictions</h3>
+                    <div class="metric-value" id="totalPredictions">-</div>
+                    <div class="metric-label">Movies analyzed</div>
+                </div>
+            </div>
+
+            <!-- ML Visualizations -->
+            <div class="feature-grid">
+                <!-- Category Distribution -->
+                <div class="feature-card">
+                    <h3>📊 Predicted Categories</h3>
+                    <div style="padding: 20px;">
+                        <canvas id="mlCategoryChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Feature Importance -->
+                <div class="feature-card">
+                    <h3>🔑 Feature Importance</h3>
+                    <div style="padding: 20px;">
+                        <canvas id="featureImportanceChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Top Predicted Movies -->
+                <div class="feature-card" style="grid-column: span 2;">
+                    <h3>🌟 Top Predicted Popular Movies</h3>
+                    <div id="topPredictedList" style="padding: 20px;">
+                        <div class="loading">Loading...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="feature-grid">
+            <div class="feature-card">
+                <h3>🎯 Analytics Features</h3>
+                <ul>
+                    <li>Real-time user behavior tracking</li>
+                    <li>Content consumption patterns</li>
+                    <li>Session analytics</li>
+                    <li>User preference analysis</li>
+                    <li>Engagement metrics</li>
+                </ul>
+            </div>
+            <div class="feature-card">
+                <h3>🤖 ML-Powered Insights</h3>
+                <ul>
+                    <li>Popularity prediction models</li>
+                    <li>Sentiment trend analysis</li>
+                    <li>Fake engagement detection</li>
+                    <li>Anomaly detection algorithms</li>
+                    <li>Predictive analytics</li>
+                </ul>
+            </div>
+            <div class="feature-card">
+                <h3>📈 Business Intelligence</h3>
+                <ul>
+                    <li>Revenue optimization insights</li>
+                    <li>Content performance metrics</li>
+                    <li>User churn prediction</li>
+                    <li>A/B testing support</li>
+                    <li>ROI tracking</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function loadDashboardData() {
+            try {
+                const response = await fetch('/api/analytics/dashboard');
+                const data = await response.json();
+                
+                // Update metrics
+                document.getElementById('totalSessions').textContent = 
+                    data.user_metrics.total_sessions || 0;
+                document.getElementById('uniqueUsers').textContent = 
+                    data.user_metrics.unique_users || 0;
+                document.getElementById('engagementRate').textContent = 
+                    ((data.content_health.engagement_rate || 0) * 100).toFixed(1) + '%';
+                document.getElementById('avgSentiment').textContent = 
+                    ((data.content_health.avg_sentiment || 0) * 100).toFixed(1) + '%';
+                
+            } catch (error) {
+                console.error('Error loading dashboard data:', error);
+            }
+        }
+
+        async function loadUserBehavior() {
+            try {
+                const response = await fetch('/api/analytics/user-behavior');
+                const data = await response.json();
+                
+                let html = '<div style="padding: 20px;">';
+                
+                if (data.action_distribution) {
+                    html += '<h3 style="color: #667eea; margin-bottom: 15px;">Action Distribution</h3>';
+                    for (const [action, count] of Object.entries(data.action_distribution)) {
+                        const percentage = (count / data.total_sessions * 100).toFixed(1);
+                        html += `
+                            <div style="margin-bottom: 15px;">
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                                    <span style="font-weight: 600; text-transform: capitalize;">${action}</span>
+                                    <span>${count} (${percentage}%)</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: ${percentage}%"></div>
+                                </div>
+                            </div>
+                        `;
+                    }
+                } else {
+                    html += '<p style="color: #666;">No behavior data available yet. Start using the app to generate analytics!</p>';
+                }
+                
+                html += '</div>';
+                document.getElementById('behaviorData').innerHTML = html;
+                
+                // Update top movies table
+                if (data.most_viewed_movies) {
+                    let tableHtml = '';
+                    let rank = 1;
+                    for (const [movie, views] of Object.entries(data.most_viewed_movies)) {
+                        tableHtml += `
+                            <tr>
+                                <td><strong>${rank}</strong></td>
+                                <td>${movie}</td>
+                                <td>${views}</td>
+                                <td><span class="badge badge-success">Trending</span></td>
+                            </tr>
+                        `;
+                        rank++;
+                    }
+                    document.getElementById('topMoviesBody').innerHTML = tableHtml;
+                } else {
+                    document.getElementById('topMoviesBody').innerHTML = 
+                        '<tr><td colspan="4" style="text-align: center; color: #666;">No movie data available yet</td></tr>';
+                }
+                
+            } catch (error) {
+                console.error('Error loading behavior data:', error);
+                document.getElementById('behaviorData').innerHTML = 
+                    '<p style="color: #f44336; padding: 20px;">Error loading behavior data</p>';
+            }
+        }
+
+        // Load EDA Visualizations
+        async function loadEDAVisualizations() {
+            try {
+                const response = await fetch('/api/analytics/eda');
+                const data = await response.json();
+                
+                if (data.error) {
+                    console.error('EDA Error:', data.error);
+                    return;
+                }
+                
+                // Update statistics cards
+                document.getElementById('totalMovies').textContent = data.total_movies.toLocaleString();
+                document.getElementById('avgRating').textContent = data.avg_rating.toFixed(2) + '/10';
+                document.getElementById('topGenre').textContent = data.top_genre[0];
+                document.getElementById('topGenreCount').textContent = data.top_genre[1].toLocaleString() + ' movies';
+                document.getElementById('avgRuntime').textContent = Math.round(data.avg_runtime) + ' min';
+                document.getElementById('avgRuntimeDisplay').textContent = Math.round(data.avg_runtime);
+                
+                // Create Rating Distribution Chart
+                const ratingCtx = document.getElementById('ratingChart').getContext('2d');
+                new Chart(ratingCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: Object.keys(data.rating_distribution),
+                        datasets: [{
+                            label: 'Number of Movies',
+                            data: Object.values(data.rating_distribution),
+                            backgroundColor: '#e50914',
+                            borderColor: '#FAFA33',
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: { display: false },
+                            title: { display: false }
+                        },
+                        scales: {
+                            y: { 
+                                beginAtZero: true,
+                                ticks: { color: '#fff' },
+                                grid: { color: '#444' }
+                            },
+                            x: { 
+                                ticks: { color: '#fff' },
+                                grid: { color: '#444' }
+                            }
+                        }
+                    }
+                });
+                
+                // Create Genre Chart
+                const genreCtx = document.getElementById('genreChart').getContext('2d');
+                new Chart(genreCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: Object.keys(data.genre_distribution),
+                        datasets: [{
+                            label: 'Movies',
+                            data: Object.values(data.genre_distribution),
+                            backgroundColor: '#e50914',
+                            borderColor: '#FAFA33',
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        indexAxis: 'y',
+                        responsive: true,
+                        plugins: {
+                            legend: { display: false }
+                        },
+                        scales: {
+                            x: { 
+                                ticks: { color: '#fff' },
+                                grid: { color: '#444' }
+                            },
+                            y: { 
+                                ticks: { color: '#fff' },
+                                grid: { color: '#444' }
+                            }
+                        }
+                    }
+                });
+                
+                // Create Release Trends Chart
+                const releaseCtx = document.getElementById('releaseTrendsChart').getContext('2d');
+                const years = Object.keys(data.yearly_releases).sort();
+                new Chart(releaseCtx, {
+                    type: 'line',
+                    data: {
+                        labels: years,
+                        datasets: [{
+                            label: 'Movies Released',
+                            data: years.map(y => data.yearly_releases[y]),
+                            borderColor: '#e50914',
+                            backgroundColor: 'rgba(229, 9, 20, 0.1)',
+                            borderWidth: 3,
+                            fill: true,
+                            tension: 0.4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: { labels: { color: '#fff' } }
+                        },
+                        scales: {
+                            y: { 
+                                ticks: { color: '#fff' },
+                                grid: { color: '#444' }
+                            },
+                            x: { 
+                                ticks: { color: '#fff' },
+                                grid: { color: '#444' }
+                            }
+                        }
+                    }
+                });
+                
+                // Display Popular Movies List
+                let popularHTML = '<div style="color: #fff;">';
+                data.top_popular_movies.forEach((movie, idx) => {
+                    popularHTML += `
+                        <div style="padding: 10px; margin: 5px 0; background: rgba(229, 9, 20, 0.2); border-left: 3px solid #e50914; border-radius: 5px;">
+                            <strong>${idx + 1}. ${movie.title}</strong><br>
+                            <small>Popularity: ${movie.popularity.toFixed(1)} | Rating: ${movie.rating.toFixed(1)}/10</small>
+                        </div>
+                    `;
+                });
+                popularHTML += '</div>';
+                document.getElementById('popularMoviesList').innerHTML = popularHTML;
+                
+                console.log('✅ EDA visualizations loaded successfully');
+                
+            } catch (error) {
+                console.error('Error loading EDA:', error);
+                document.getElementById('totalMovies').textContent = 'Error';
+                document.getElementById('avgRating').textContent = 'Error';
+                document.getElementById('topGenre').textContent = 'Error';
+                document.getElementById('topGenreCount').textContent = 'Error loading data';
+            }
+        }
+
+        // Load Sentiment Analysis
+        async function loadSentimentAnalysis() {
+            try {
+                const response = await fetch('/api/analytics/sentiment');
+                const data = await response.json();
+                
+                if (data.error) {
+                    console.error('Sentiment Error:', data.error);
+                    return;
+                }
+                
+                // Update statistics cards
+                document.getElementById('positiveCount').textContent = data.positive_count.toLocaleString();
+                document.getElementById('neutralCount').textContent = data.neutral_count.toLocaleString();
+                document.getElementById('negativeCount').textContent = data.negative_count.toLocaleString();
+                document.getElementById('positivePercent').textContent = data.positive_percentage.toFixed(1) + '%';
+                document.getElementById('neutralPercent').textContent = data.neutral_percentage.toFixed(1) + '%';
+                document.getElementById('negativePercent').textContent = data.negative_percentage.toFixed(1) + '%';
+                document.getElementById('avgSentimentScore').textContent = data.avg_sentiment_score.toFixed(3);
+                
+                // Create Sentiment Distribution Pie Chart
+                const sentimentCtx = document.getElementById('sentimentDistChart').getContext('2d');
+                new Chart(sentimentCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: Object.keys(data.sentiment_distribution),
+                        datasets: [{
+                            data: Object.values(data.sentiment_distribution),
+                            backgroundColor: ['#28a745', '#ffc107', '#e50914'],
+                            borderColor: '#181818',
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: { color: '#fff', font: { size: 12 } }
+                            }
+                        }
+                    }
+                });
+                
+                // Create Genre-wise Sentiment Chart
+                const genreSentCtx = document.getElementById('genreSentimentChart').getContext('2d');
+                const genres = Object.keys(data.genre_sentiments);
+                const positiveData = genres.map(g => data.genre_sentiments[g].positive);
+                const neutralData = genres.map(g => data.genre_sentiments[g].neutral);
+                const negativeData = genres.map(g => data.genre_sentiments[g].negative);
+                
+                new Chart(genreSentCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: genres,
+                        datasets: [
+                            {
+                                label: 'Positive',
+                                data: positiveData,
+                                backgroundColor: '#28a745',
+                                borderColor: '#FAFA33',
+                                borderWidth: 1
+                            },
+                            {
+                                label: 'Neutral',
+                                data: neutralData,
+                                backgroundColor: '#ffc107',
+                                borderColor: '#FAFA33',
+                                borderWidth: 1
+                            },
+                            {
+                                label: 'Negative',
+                                data: negativeData,
+                                backgroundColor: '#e50914',
+                                borderColor: '#FAFA33',
+                                borderWidth: 1
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            x: {
+                                stacked: true,
+                                ticks: { color: '#fff' },
+                                grid: { color: '#444' }
+                            },
+                            y: {
+                                stacked: true,
+                                ticks: { color: '#fff' },
+                                grid: { color: '#444' }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                labels: { color: '#fff' }
+                            }
+                        }
+                    }
+                });
+                
+                // Display Most Positive Movies
+                let positiveHTML = '<div style="color: #fff;">';
+                data.most_positive_movies.forEach((movie, idx) => {
+                    positiveHTML += `
+                        <div style="padding: 10px; margin: 5px 0; background: rgba(40, 167, 69, 0.2); border-left: 3px solid #28a745; border-radius: 5px;">
+                            <strong>${idx + 1}. ${movie.title}</strong><br>
+                            <small>Sentiment: ${movie.sentiment_score.toFixed(3)} | Rating: ${movie.rating.toFixed(1)}/10</small>
+                        </div>
+                    `;
+                });
+                positiveHTML += '</div>';
+                document.getElementById('positiveMoviesList').innerHTML = positiveHTML;
+                
+                // Display Most Negative Movies
+                let negativeHTML = '<div style="color: #fff;">';
+                data.most_negative_movies.forEach((movie, idx) => {
+                    negativeHTML += `
+                        <div style="padding: 10px; margin: 5px 0; background: rgba(229, 9, 20, 0.2); border-left: 3px solid #e50914; border-radius: 5px;">
+                            <strong>${idx + 1}. ${movie.title}</strong><br>
+                            <small>Sentiment: ${movie.sentiment_score.toFixed(3)} | Rating: ${movie.rating.toFixed(1)}/10</small>
+                        </div>
+                    `;
+                });
+                negativeHTML += '</div>';
+                document.getElementById('negativeMoviesList').innerHTML = negativeHTML;
+                
+                console.log('✅ Sentiment analysis loaded successfully');
+                
+            } catch (error) {
+                console.error('Error loading sentiment analysis:', error);
+                document.getElementById('positiveCount').textContent = 'Error';
+                document.getElementById('neutralCount').textContent = 'Error';
+                document.getElementById('negativeCount').textContent = 'Error';
+                document.getElementById('avgSentimentScore').textContent = 'Error';
+            }
+        }
+
+        // Load ML Predictions
+        async function loadMLPredictions() {
+            try {
+                const response = await fetch('/api/analytics/ml-predictions');
+                const data = await response.json();
+                
+                if (data.error) {
+                    console.error('ML Error:', data.error);
+                    return;
+                }
+                
+                // Update metrics
+                document.getElementById('r2Score').textContent = data.model_metrics.regression_r2.toFixed(3);
+                document.getElementById('classAccuracy').textContent = (data.model_metrics.classification_accuracy * 100).toFixed(1) + '%';
+                document.getElementById('avgPredicted').textContent = data.predictions_summary.avg_predicted_popularity.toFixed(2);
+                document.getElementById('totalPredictions').textContent = data.predictions_summary.total_predictions.toLocaleString();
+                
+                // Category Distribution Chart
+                const mlCatCtx = document.getElementById('mlCategoryChart').getContext('2d');
+                new Chart(mlCatCtx, {
+                    type: 'pie',
+                    data: {
+                        labels: Object.keys(data.predictions_summary.category_distribution),
+                        datasets: [{
+                            data: Object.values(data.predictions_summary.category_distribution),
+                            backgroundColor: ['#e50914', '#ffc107', '#28a745']
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: { labels: { color: '#fff' } }
+                        }
+                    }
+                });
+                
+                // Feature Importance Chart
+                const featCtx = document.getElementById('featureImportanceChart').getContext('2d');
+                const features = data.feature_importance.slice(0, 8);
+                new Chart(featCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: features.map(f => f.feature),
+                        datasets: [{
+                            label: 'Importance',
+                            data: features.map(f => f.importance),
+                            backgroundColor: '#e50914',
+                            borderColor: '#FAFA33',
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        indexAxis: 'y',
+                        responsive: true,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            x: { ticks: { color: '#fff' }, grid: { color: '#444' } },
+                            y: { ticks: { color: '#fff' }, grid: { color: '#444' } }
+                        }
+                    }
+                });
+                
+                // Top Predicted Movies
+                let html = '<div style="color: #fff;">';
+                data.top_predicted_movies.forEach((movie, idx) => {
+                    html += `
+                        <div style="padding: 10px; margin: 5px 0; background: rgba(229, 9, 20, 0.2); border-left: 3px solid #e50914; border-radius: 5px;">
+                            <strong>${idx + 1}. ${movie.title}</strong><br>
+                            <small>Predicted: ${movie.predicted_popularity.toFixed(2)} | Actual: ${movie.actual_popularity.toFixed(2)} | Rating: ${movie.rating.toFixed(1)}/10</small>
+                        </div>
+                    `;
+                });
+                html += '</div>';
+                document.getElementById('topPredictedList').innerHTML = html;
+                
+                console.log('✅ ML predictions loaded');
+            } catch (error) {
+                console.error('Error loading ML predictions:', error);
+                document.getElementById('r2Score').textContent = 'Error';
+            }
+        }
+
+        function refreshData() {
+            loadDashboardData();
+            loadUserBehavior();
+        }
+
+        // Load data on page load
+        window.addEventListener('load', () => {
+            loadDashboardData();
+            loadUserBehavior();
+            loadEDAVisualizations();
+            loadSentimentAnalysis();
+            loadMLPredictions();
+        });
+
+        // Auto-refresh every 30 seconds
+        setInterval(refreshData, 30000);
+    </script>
+</body>
+</html>
